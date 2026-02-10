@@ -343,7 +343,7 @@ export default function AdminBookingsPage() {
                                 e.target.value as "NEW" | "CONTACTED" | "SCHEDULED"
                               )
                             }
-                            className={`text-xs font-semibold rounded-full px-3 py-1 border-0 focus:ring-2 focus:ring-gray-900 ${getStatusBadgeColor(
+                            className={`text-xs font-semibold rounded-full px-3 py-1 bg-white border-0 focus:ring-2 focus:ring-slate-900/20 ${getStatusBadgeColor(
                               booking.status
                             )}`}
                           >

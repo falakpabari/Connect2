@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ProfessionalProfile, ProfessionalProfileInsert } from "@/lib/types";
 import { formatPriceWithSession } from "@/lib/utils";
+import { FormInput, FormTextarea, FormSelect } from "@/components/FormComponents";
 
 export default function AdminProfessionalsPage() {
   const [profiles, setProfiles] = useState<ProfessionalProfile[]>([]);
@@ -14,6 +15,8 @@ export default function AdminProfessionalsPage() {
   const [editingProfile, setEditingProfile] = useState<ProfessionalProfile | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [showOtherCompany, setShowOtherCompany] = useState(false);
+  const [customCompany, setCustomCompany] = useState("");
   const router = useRouter();
 
   const [formData, setFormData] = useState<ProfessionalProfileInsert>({
@@ -73,6 +76,12 @@ export default function AdminProfessionalsPage() {
     setMessage("");
     setError("");
 
+    // Use custom company if "Other" is selected
+    const finalFormData = {
+      ...formData,
+      company: showOtherCompany ? customCompany : formData.company,
+    };
+
     const url = editingProfile
       ? `/api/admin/professionals/${editingProfile.id}`
       : "/api/admin/professionals";
@@ -82,7 +91,7 @@ export default function AdminProfessionalsPage() {
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(finalFormData),
     });
 
     const data = await response.json();
@@ -100,9 +109,21 @@ export default function AdminProfessionalsPage() {
 
   const handleEdit = (profile: ProfessionalProfile) => {
     setEditingProfile(profile);
+    
+    // Check if company is in the predefined list
+    const predefinedCompanies = [
+      "McKinsey & Company", "Bain & Company", "Boston Consulting Group (BCG)", "Deloitte", 
+      "Accenture", "PwC", "EY", "KPMG", "Goldman Sachs", "Morgan Stanley", "J.P. Morgan",
+      "Bank of America", "Citi", "Barclays", "BlackRock", "Bridgewater", "Jane Street",
+      "Citadel", "Two Sigma", "Google", "Meta", "Amazon", "Microsoft", "Apple", "Netflix",
+      "Stripe", "Airbnb", "Uber", "Databricks", "OpenAI"
+    ];
+    
+    const isOther = !predefinedCompanies.includes(profile.company);
+    
     setFormData({
       name: profile.name,
-      company: profile.company,
+      company: isOther ? "Other" : profile.company,
       role_title: profile.role_title,
       industry: profile.industry,
       bio: profile.bio,
@@ -110,6 +131,15 @@ export default function AdminProfessionalsPage() {
       calendly_link: profile.calendly_link || "",
       is_approved: profile.is_approved,
     });
+    
+    if (isOther) {
+      setShowOtherCompany(true);
+      setCustomCompany(profile.company);
+    } else {
+      setShowOtherCompany(false);
+      setCustomCompany("");
+    }
+    
     setShowForm(true);
   };
 
@@ -158,6 +188,8 @@ export default function AdminProfessionalsPage() {
       calendly_link: "",
       is_approved: true,
     });
+    setShowOtherCompany(false);
+    setCustomCompany("");
   };
 
   const handleCancel = () => {
@@ -219,102 +251,128 @@ export default function AdminProfessionalsPage() {
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company *
-                </label>
-                <input
-                  type="text"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Role Title *
-                </label>
-                <input
-                  type="text"
-                  value={formData.role_title}
-                  onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Industry *
-                </label>
-                <input
-                  type="text"
-                  value={formData.industry}
-                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (in cents) *
-                </label>
-                <input
-                  type="number"
-                  value={formData.price_cents}
-                  onChange={(e) => setFormData({ ...formData, price_cents: parseInt(e.target.value) })}
-                  required
-                  min="0"
-                  step="100"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Current: {formatPriceWithSession(formData.price_cents)}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Calendly Link
-                </label>
-                <input
-                  type="url"
-                  value={formData.calendly_link || ""}
-                  onChange={(e) => setFormData({ ...formData, calendly_link: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  placeholder="https://calendly.com/..."
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bio *
-              </label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+              <FormInput
+                label="Name *"
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
+
+              <div>
+                <FormSelect
+                  label="Company *"
+                  value={formData.company}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({ ...formData, company: value });
+                    setShowOtherCompany(value === "Other");
+                    if (value !== "Other") {
+                      setCustomCompany("");
+                    }
+                  }}
+                  required
+                >
+                  <option value="">Select a company</option>
+                  <optgroup label="Consulting">
+                    <option value="McKinsey & Company">McKinsey & Company</option>
+                    <option value="Bain & Company">Bain & Company</option>
+                    <option value="Boston Consulting Group (BCG)">Boston Consulting Group (BCG)</option>
+                    <option value="Deloitte">Deloitte</option>
+                    <option value="Accenture">Accenture</option>
+                    <option value="PwC">PwC</option>
+                    <option value="EY">EY</option>
+                    <option value="KPMG">KPMG</option>
+                  </optgroup>
+                  <optgroup label="Finance">
+                    <option value="Goldman Sachs">Goldman Sachs</option>
+                    <option value="Morgan Stanley">Morgan Stanley</option>
+                    <option value="J.P. Morgan">J.P. Morgan</option>
+                    <option value="Bank of America">Bank of America</option>
+                    <option value="Citi">Citi</option>
+                    <option value="Barclays">Barclays</option>
+                    <option value="BlackRock">BlackRock</option>
+                    <option value="Bridgewater">Bridgewater</option>
+                    <option value="Jane Street">Jane Street</option>
+                    <option value="Citadel">Citadel</option>
+                    <option value="Two Sigma">Two Sigma</option>
+                  </optgroup>
+                  <optgroup label="Tech">
+                    <option value="Google">Google</option>
+                    <option value="Meta">Meta</option>
+                    <option value="Amazon">Amazon</option>
+                    <option value="Microsoft">Microsoft</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Netflix">Netflix</option>
+                    <option value="Stripe">Stripe</option>
+                    <option value="Airbnb">Airbnb</option>
+                    <option value="Uber">Uber</option>
+                    <option value="Databricks">Databricks</option>
+                    <option value="OpenAI">OpenAI</option>
+                  </optgroup>
+                  <optgroup label="Other">
+                    <option value="Other">Other (type manually)</option>
+                  </optgroup>
+                </FormSelect>
+                
+                {showOtherCompany && (
+                  <div className="mt-2">
+                    <FormInput
+                      label="Custom Company Name *"
+                      type="text"
+                      value={customCompany}
+                      onChange={(e) => setCustomCompany(e.target.value)}
+                      required
+                      placeholder="Enter company name"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <FormInput
+                label="Role Title *"
+                type="text"
+                value={formData.role_title}
+                onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
+                required
+              />
+
+              <FormInput
+                label="Industry *"
+                type="text"
+                value={formData.industry}
+                onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                required
+              />
+
+              <FormInput
+                label="Price (in cents) *"
+                type="number"
+                value={formData.price_cents}
+                onChange={(e) => setFormData({ ...formData, price_cents: parseInt(e.target.value) })}
+                required
+                min={0}
+                step={100}
+                helperText={`Preview: ${formatPriceWithSession(formData.price_cents)}`}
+              />
+
+              <FormInput
+                label="Calendly Link"
+                type="url"
+                value={formData.calendly_link || ""}
+                onChange={(e) => setFormData({ ...formData, calendly_link: e.target.value })}
+                placeholder="https://calendly.com/..."
+                helperText="Used on booking success page"
               />
             </div>
+
+            <FormTextarea
+              label="Bio *"
+              value={formData.bio}
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+              required
+              rows={4}
+            />
 
             <div className="flex items-center">
               <input
