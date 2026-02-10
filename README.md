@@ -16,6 +16,9 @@ A clean, invite-only networking marketplace MVP connecting students with top pro
 - 👨‍💼 **Admin-managed**: Only admins can create/edit/approve professional profiles
 - 🔍 **Public directory**: Browse approved professionals with search and filters
 - 💼 **Professional profiles**: Detailed profiles with booking integration
+- 📅 **Booking requests**: Students can request sessions through a simple modal form
+- 📧 **Email notifications**: Admins receive notifications for new booking requests
+- 🎯 **Request management**: Admin dashboard to track and update booking status
 - 🔐 **Magic link auth**: Secure admin authentication via email
 - 📱 **Responsive design**: Beautiful UI that works on all devices
 
@@ -87,8 +90,14 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 1. Go to `/admin/login`
 2. Enter your admin email (must be in `ADMIN_EMAILS` env var)
 3. Check your email for the magic link
-4. Click the link to access `/admin/professionals`
-5. Create, edit, approve/unapprove, or delete professional profiles
+4. Click the link to access the admin dashboard
+
+**Admin Features:**
+- **Professionals** (`/admin/professionals`): Create, edit, approve/unapprove, or delete professional profiles
+- **Bookings** (`/admin/bookings`): View and manage session booking requests from students
+  - Filter by status: ALL, NEW, CONTACTED, SCHEDULED
+  - Update booking status with dropdown
+  - View student contact info and preferred times
 
 ### How to Add a New Professional (Admin)
 
@@ -158,9 +167,28 @@ Connect2/
 | created_at     | timestamp | Creation timestamp                   |
 | updated_at     | timestamp | Last update timestamp                |
 
+### booking_requests
+
+| Column          | Type      | Description                                    |
+|-----------------|-----------|------------------------------------------------|
+| id              | uuid      | Primary key                                    |
+| professional_id | uuid      | Foreign key to professional_profiles           |
+| student_name    | text      | Student's name                                 |
+| student_email   | text      | Student's email                                |
+| preferred_times | text      | Student's preferred times for session          |
+| note            | text      | Optional note from student                     |
+| status          | text      | NEW, CONTACTED, or SCHEDULED                   |
+| created_at      | timestamp | Creation timestamp                             |
+| updated_at      | timestamp | Last update timestamp                          |
+
 ### Row Level Security (RLS)
 
+**professional_profiles:**
 - **Public**: Can SELECT only where `is_approved = true`
+- **Service Role**: Full access (used by admin API routes)
+
+**booking_requests:**
+- **Public**: Can INSERT (anyone can create booking requests)
 - **Service Role**: Full access (used by admin API routes)
 
 ## Deployment
