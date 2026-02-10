@@ -19,8 +19,23 @@ export async function isAdmin(): Promise<boolean> {
 }
 
 export async function requireAdmin() {
-  const admin = await isAdmin();
-  if (!admin) {
+  const supabase = await createClient();
+  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    throw new Error('Unauthorized: Not authenticated');
+  }
+
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map((email: string) =>
+    email.trim().toLowerCase()
+  ) || [];
+
+  if (!adminEmails.includes(user.email.toLowerCase())) {
     throw new Error('Unauthorized: Admin access required');
   }
+
+  return user;
 }
