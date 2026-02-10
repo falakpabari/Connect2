@@ -12,15 +12,15 @@ A clean, invite-only networking marketplace MVP connecting students with top pro
 
 ## Features
 
-- 🔒 **Invite-only**: Professionals cannot self-sign-up
-- 👨‍💼 **Admin-managed**: Only admins can create/edit/approve professional profiles
-- 🔍 **Public directory**: Browse approved professionals with search and filters
-- 💼 **Professional profiles**: Detailed profiles with booking integration
-- 📅 **Booking requests**: Students can request sessions through a simple modal form
-- 📧 **Email notifications**: Admins receive notifications for new booking requests
-- 🎯 **Request management**: Admin dashboard to track and update booking status
-- 🔐 **Magic link auth**: Secure admin authentication via email
-- 📱 **Responsive design**: Beautiful UI that works on all devices
+- **Invite-only**: Professionals cannot self-sign-up
+- **Admin-managed**: Only admins can create/edit/approve professional profiles
+- **Public directory**: Browse approved professionals with search and filters
+- **Professional profiles**: Detailed profiles with booking integration
+- **Booking requests**: Students can request sessions through a simple modal form
+- **Email notifications**: Admins receive notifications for new booking requests
+- **Request management**: Admin dashboard to track and update booking status
+- **Magic link auth**: Secure admin authentication via email
+- **Responsive design**: Beautiful UI that works on all devices
 
 ## Local Setup
 
@@ -67,7 +67,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ADMIN_EMAILS=your-email@example.com,another-admin@example.com
 ```
 
-⚠️ **Important**: Replace the placeholder values with your actual Supabase credentials and admin email(s).
+**Important**: Replace the placeholder values with your actual Supabase credentials and admin email(s).
 
 ### Step 5: Run the Development Server
 

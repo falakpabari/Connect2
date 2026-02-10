@@ -14,6 +14,10 @@ export default function ProfessionalProfilePage() {
   const [profile, setProfile] = useState<ProfessionalProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [studentName, setStudentName] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+  const [showBookingForm, setShowBookingForm] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -49,6 +53,49 @@ export default function ProfessionalProfilePage() {
   if (!profile) {
     notFound();
   }
+
+  const handlePaidBooking = async () => {
+    if (!studentName.trim() || !studentEmail.trim()) {
+      alert("Please enter your name and email");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(studentEmail)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    setBookingLoading(true);
+
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          professional_id: profile.id,
+          student_name: studentName.trim(),
+          student_email: studentEmail.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        alert(data.error || "Failed to create checkout session");
+        setBookingLoading(false);
+        return;
+      }
+
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      alert("An unexpected error occurred");
+      setBookingLoading(false);
+    }
+  };
 
   return (
     <>
@@ -88,29 +135,89 @@ export default function ProfessionalProfilePage() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setShowModal(true)}
-                className="block w-full bg-gray-900 text-white px-6 py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-colors text-center"
-              >
-                Request Session
-              </button>
-
-              {profile.calendly_link && (
-                <div className="mt-4 text-center">
-                  <a
-                    href={profile.calendly_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              {!showBookingForm ? (
+                <>
+                  <button
+                    onClick={() => setShowBookingForm(true)}
+                    className="block w-full bg-gray-900 text-white px-6 py-4 rounded-lg font-semibold text-lg hover:bg-gray-800 transition-colors text-center"
                   >
-                    Or schedule directly via Calendly →
-                  </a>
+                    Book Paid Session
+                  </button>
+
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="block w-full mt-3 bg-white text-gray-700 px-6 py-3 rounded-lg font-medium text-base hover:bg-gray-50 transition-colors text-center border border-gray-300"
+                  >
+                    Request Free Intro
+                  </button>
+
+                  {profile.calendly_link && (
+                    <div className="mt-4 text-center">
+                      <a
+                        href={profile.calendly_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      >
+                        Or schedule directly via Calendly →
+                      </a>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      placeholder="John Doe"
+                      disabled={bookingLoading}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Email *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      placeholder="john@example.com"
+                      disabled={bookingLoading}
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handlePaidBooking}
+                      disabled={bookingLoading}
+                      className="flex-1 bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {bookingLoading ? "Processing..." : "Continue to Payment"}
+                    </button>
+                    <button
+                      onClick={() => setShowBookingForm(false)}
+                      disabled={bookingLoading}
+                      className="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <p className="text-sm text-gray-500 text-center">
+                    You&apos;ll be redirected to Stripe to complete your payment securely
+                  </p>
                 </div>
               )}
-
-              <p className="text-sm text-gray-500 text-center mt-4">
-                Submit a request and we&apos;ll coordinate scheduling
-              </p>
             </div>
           </div>
         </div>

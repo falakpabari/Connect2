@@ -90,3 +90,44 @@ CREATE TRIGGER update_booking_requests_updated_at
   BEFORE UPDATE ON booking_requests
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- Create sessions table for paid bookings
+CREATE TABLE IF NOT EXISTS sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  professional_id UUID NOT NULL REFERENCES professional_profiles(id) ON DELETE CASCADE,
+  student_name TEXT NOT NULL,
+  student_email TEXT NOT NULL,
+  stripe_payment_intent_id TEXT NOT NULL UNIQUE,
+  amount_cents INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'PAID', 'SCHEDULED', 'COMPLETED', 'CANCELLED')),
+  scheduled_at TIMESTAMPTZ,
+  calendly_event_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security for sessions
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Public cannot read sessions (privacy)
+-- No public SELECT policy
+
+-- Policy: Service role can do everything (admin operations and webhook)
+CREATE POLICY "Service role can do everything on sessions"
+  ON sessions
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+-- Create indexes for faster queries
+CREATE INDEX IF NOT EXISTS idx_sessions_professional_id ON sessions(professional_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_student_email ON sessions(student_email);
+CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
+CREATE INDEX IF NOT EXISTS idx_sessions_stripe_payment_intent_id ON sessions(stripe_payment_intent_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at DESC);
+
+-- Create trigger to automatically update updated_at for sessions
+CREATE TRIGGER update_sessions_updated_at
+  BEFORE UPDATE ON sessions
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
