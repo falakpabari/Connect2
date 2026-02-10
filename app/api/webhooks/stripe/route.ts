@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Create session record in database
-      const supabase = createAdminClient();
+      const supabase = await createAdminClient();
 
       // Fetch professional to get calendly_link
       const { data: professional, error: professionalError } = await supabase

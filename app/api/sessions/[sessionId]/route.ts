@@ -38,7 +38,7 @@ export async function GET(
     }
 
     // Fetch session from database
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
     const { data: session, error: sessionError } = await supabase
       .from("sessions")
       .select("*")

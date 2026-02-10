@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
 
     // Fetch all booking requests with professional details
     const { data: bookingRequests, error } = await supabase

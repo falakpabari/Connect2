@@ -4,7 +4,7 @@ import { SessionWithProfessional } from "@/lib/types";
 
 export async function GET() {
   try {
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
 
     // Fetch all sessions with professional details
     const { data: sessions, error } = await supabase

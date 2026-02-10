@@ -26,7 +26,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
 
     // Update booking request status
     const { data, error } = await supabase

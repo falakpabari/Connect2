@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch professional details
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
     const { data: professional, error: professionalError } = await supabase
       .from("professional_profiles")
       .select("id, name, company, role_title, price_cents, is_approved")

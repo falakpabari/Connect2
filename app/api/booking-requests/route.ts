@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Use admin client to insert (bypasses RLS)
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
 
     // First, verify the professional exists and is approved
     const { data: professional, error: professionalError } = await supabase

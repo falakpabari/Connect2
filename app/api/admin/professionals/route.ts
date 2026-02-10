@@ -7,7 +7,7 @@ export async function GET() {
   try {
     await requireAdmin();
 
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
     const { data, error } = await supabase
       .from("professional_profiles")
       .select("*")
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     const body: ProfessionalProfileInsert = await request.json();
 
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
     const { data, error } = await supabase
       .from("professional_profiles")
       .insert(body)

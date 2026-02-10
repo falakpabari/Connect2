@@ -14,7 +14,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     const { id } = await params;
     const body: ProfessionalProfileUpdate = await request.json();
 
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
     const { data, error } = await supabase
       .from("professional_profiles")
       .update(body)
@@ -39,7 +39,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     const { id } = await params;
 
-    const supabase = createAdminClient();
+    const supabase = await createAdminClient();
     const { error } = await supabase
       .from("professional_profiles")
       .delete()
