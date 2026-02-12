@@ -43,47 +43,30 @@ export default function RootLayout({
               <Link href="/" className="text-2xl font-bold text-gray-900">
                 Connect2
               </Link>
-              <nav className="flex gap-6">
-                {isAdminRoute && isAuthenticated ? (
-                  <>
-                    <Link
-                      href="/admin/professionals"
-                      className={`transition-colors ${
-                        pathname === "/admin/professionals"
-                          ? "text-gray-900 font-semibold"
-                          : "text-gray-600 hover:text-gray-900"
-                      }`}
-                    >
-                      Professionals
-                    </Link>
-                    <Link
-                      href="/admin/bookings"
-                      className={`transition-colors ${
-                        pathname === "/admin/bookings"
-                          ? "text-gray-900 font-semibold"
-                          : "text-gray-600 hover:text-gray-900"
-                      }`}
-                    >
-                      Bookings
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/professionals"
-                      className="text-gray-600 hover:text-gray-900 transition-colors"
-                    >
-                      Browse Professionals
-                    </Link>
-                    <Link
-                      href="/admin/login"
-                      className="text-gray-600 hover:text-gray-900 transition-colors"
-                    >
-                      Admin
-                    </Link>
-                  </>
-                )}
-              </nav>
+              {isAdminRoute && isAuthenticated && (
+                <nav className="flex gap-6">
+                  <Link
+                    href="/admin/professionals"
+                    className={`transition-colors ${
+                      pathname === "/admin/professionals"
+                        ? "text-gray-900 font-semibold"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Professionals
+                  </Link>
+                  <Link
+                    href="/admin/bookings"
+                    className={`transition-colors ${
+                      pathname === "/admin/bookings"
+                        ? "text-gray-900 font-semibold"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Bookings
+                  </Link>
+                </nav>
+              )}
             </div>
           </div>
         </header>

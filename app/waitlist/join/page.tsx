@@ -16,13 +16,13 @@ const INTERESTS = [
   "Other",
 ];
 
-const GRAD_YEARS = [2026, 2027, 2028, 2029, 2030, 2031];
+const GRAD_YEARS = [2026, 2027, 2028, 2029, 2030];
 
 export default function WaitlistJoinPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    university: "",
+    university: "Brown University",
     gradYear: "",
     interests: [] as string[],
     targetCompanies: "",
@@ -199,9 +199,8 @@ export default function WaitlistJoinPage() {
                 id="university"
                 required
                 value={formData.university}
-                onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                placeholder="Brown University"
+                disabled
+                className="w-full px-4 py-3 bg-slate-900/30 border border-slate-600 rounded-lg text-slate-400 cursor-not-allowed"
               />
             </div>
 

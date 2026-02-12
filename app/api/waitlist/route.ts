@@ -32,9 +32,17 @@ export async function POST(request: NextRequest) {
 
     // Validate graduation year
     const year = parseInt(gradYear);
-    if (isNaN(year) || year < 2026 || year > 2031) {
+    if (isNaN(year) || year < 2026 || year > 2030) {
       return NextResponse.json(
         { error: "Invalid graduation year" },
+        { status: 400 }
+      );
+    }
+
+    // Validate university is Brown University
+    if (university !== "Brown University") {
+      return NextResponse.json(
+        { error: "Only Brown University students are eligible at this time" },
         { status: 400 }
       );
     }
@@ -66,6 +74,14 @@ export async function POST(request: NextRequest) {
           interests,
           target_companies: targetCompanies,
           note,
+        });
+      } else {
+        // Log success
+        console.log("✅ Waitlist signup successfully saved to Supabase:", {
+          name,
+          email,
+          university,
+          grad_year: year,
         });
       }
     } catch (dbError) {
