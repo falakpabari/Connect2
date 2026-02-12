@@ -131,3 +131,40 @@ CREATE TRIGGER update_sessions_updated_at
   BEFORE UPDATE ON sessions
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- Create waitlist_signups table
+CREATE TABLE IF NOT EXISTS waitlist_signups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  university TEXT NOT NULL,
+  grad_year INTEGER NOT NULL,
+  interests TEXT[] NOT NULL,
+  target_companies TEXT,
+  note TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security for waitlist_signups
+ALTER TABLE waitlist_signups ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Anyone can INSERT waitlist signups (public)
+CREATE POLICY "Anyone can create waitlist signups"
+  ON waitlist_signups
+  FOR INSERT
+  WITH CHECK (true);
+
+-- Policy: No public SELECT (privacy)
+-- Only service role can read waitlist signups
+
+-- Policy: Service role can do everything (admin operations)
+CREATE POLICY "Service role can do everything on waitlist signups"
+  ON waitlist_signups
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
+
+-- Create indexes for faster queries
+CREATE INDEX IF NOT EXISTS idx_waitlist_signups_email ON waitlist_signups(email);
+CREATE INDEX IF NOT EXISTS idx_waitlist_signups_university ON waitlist_signups(university);
+CREATE INDEX IF NOT EXISTS idx_waitlist_signups_created_at ON waitlist_signups(created_at DESC);

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { UserPlus, Link2, Calendar } from "lucide-react";
+import Link from "next/link";
 
 function Hero() {
   const companies = [
@@ -88,13 +89,15 @@ function Hero() {
         </div>
 
         {/* CTA Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
-          className="bg-emerald-500 hover:bg-emerald-400 text-white px-10 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-400/30"
-        >
-          Join the Waitlist
-        </motion.button>
+        <Link href="/waitlist/join">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="bg-emerald-500 hover:bg-emerald-400 text-white px-10 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-400/30"
+          >
+            Join the Waitlist
+          </motion.button>
+        </Link>
       </motion.div>
     </section>
   );
@@ -213,13 +216,15 @@ function ScarcityLaunch() {
         </p>
 
         {/* CTA */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
-          className="bg-emerald-500 hover:bg-emerald-400 text-white px-12 py-5 rounded-lg font-semibold text-lg transition-all shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-400/40"
-        >
-          Request Early Access
-        </motion.button>
+        <Link href="/waitlist/join">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="bg-emerald-500 hover:bg-emerald-400 text-white px-12 py-5 rounded-lg font-semibold text-lg transition-all shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-400/40"
+          >
+            Request Early Access
+          </motion.button>
+        </Link>
       </motion.div>
     </section>
   );
